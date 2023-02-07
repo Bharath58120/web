@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JsTask</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+  <body>
+    <script defer src="script.js"></script>
+    <h1>
+      <center>CRUD APPLICATION USING JAVASCRIPT</center>
+    </h1>
+    <div class="user-data">
+      <form id="formdata">
+        <div>
+          <label>User Id</label>
+          <input
+            type="text"
+            name="userids"
+            id="userid" required
+            placeholder="enter userid"
+          />
+        </div>
+        <div>
+          <label>Id*</label>
+          <input type="text" name="ids" id="id" required placeholder="enter id" />
+        </div>
+        <div>
+          <label>Tittle</label>
+          <input
+            type="text"
+            name="title"
+            id="tittle" required
+            placeholder="enter title"
+          />
+        </div>
+
+        <div class="submit">
+          <button type="submit" class="submit">SUBMIT</button>
+        </div>
+        
+      </form>
+      <button id="create-button">create</button>
+    </div>
+    
+    <div class="searchbar">
+      <input type="text" id="search-input" placeholder="search title" /><br />
+      <button id="search-button">Search</button>
+  
+    </div>
+
+    <br />
+    
+      <table id="t2">
+        <thead>
+          <tr>
+            <th>SNO</th>
+            <th>User Id</th>
+            <th>Id</th>
+            <th id="t1">
+              Tittle <br /><button id="sortase">Sort(TA&uarr;)</button
+              ><button id="sortdse">Sort(TD&darr;)</button>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="table-data"></tbody>
+      </table>
+    </div>
+  </body>
+</html>
