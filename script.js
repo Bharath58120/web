@@ -8,9 +8,7 @@ let title = document.querySelector("#tittle");
 let submit = document.querySelector(".submit");
 const sortAsc = document.getElementById("sortase");
 const sortDes = document.getElementById("sortdse");
-const searchButton = document.getElementById("search-button");
 const form = document.querySelector("#formdata");
-var btnedit = document.querySelector("#table-data").querySelector(".edit");
 const create = document.querySelector("#create-button");
 create.addEventListener("click", (e) => {
   e.preventDefault();
@@ -20,31 +18,30 @@ create.addEventListener("click", (e) => {
 const displaydata = function (apiData) {
   let html = "<table>";
   for (let i = 0; i < apiData.length; i++) {
-    html += "<tr>";
-    html += "<td>" + (i + 1) + "</td>";
-    html += "<td>" + apiData[i].userId + "</td>";
-    html += "<td>" + apiData[i].id + "</td>";
-    html += "<td>" + apiData[i].title + "</td>";
-    html +=
-      '<td><button  onclick="deleteData(' +
-      i +
-      ')" class="delete"><i class="fa fa-trash-o"></i></button> <button onclick="updaterow(' +
-      i +
-      ')" class="edit"><i class="fa fa-edit"></i></button></td>';
+    html += `<tr>`;
+    html += `<td>${i + 1}</td>`;
+    html += `<td>${apiData[i].userId}</td>`;
+    html += `<td>${apiData[i].id}</td>`;
+    html += `<td>${apiData[i].title}</td>`;
+    html += `<td class ="x"><div class="btn${i}" ><button  onclick="deleteData(${i})" class="delete"><i class="fa fa-trash-o"></i></button> <button onclick="updaterow(${i})" class="edit"><i class="fa fa-edit"></i></button></div>
+      <div class ="up${i}" id="abc">
+        <input type="text" name="ids" id="id"  placeholder="enter new title" />
+        <button  class="save">save</button>
+      </div>
+      </td>`;
     html += "</tr>";
   }
   html += "</table>";
   document.getElementById("table-data").innerHTML = html;
 };
 const api = async function () {
-  const response = await fetch("https://jsonplaceholder.typicode.com/todos");
+  const response = await fetch("http://localhost:58120/users");
   let data = await response.json();
   data = data.splice(0, 10);
   window.localStorage.setItem("todosdata", JSON.stringify(data));
   let apidata = window.localStorage.getItem("todosdata");
   apiData.push(JSON.parse(apidata));
   let printdata = apiData.flat(1);
-  // console.log("printdata");
   displaydata(printdata);
 };
 if (
@@ -52,7 +49,6 @@ if (
   window.localStorage.getItem("todosdata").length > 2
 ) {
   const apidata = JSON.parse(window.localStorage.getItem("todosdata"));
-  // apiData = apidata.slice(0, 20);
   displaydata(apidata);
 } else {
   api();
@@ -66,7 +62,7 @@ form.addEventListener("submit", (e) => {
     id: id.value,
     title: title.value,
   };
-  fetch("https://jsonplaceholder.typicode.com/todos", {
+  fetch("http://localhost:58120/users", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -83,65 +79,84 @@ form.addEventListener("submit", (e) => {
     });
   userid.value = id.value = title.value = "";
 });
+var btnedit = document.querySelector("#table-data");
+var btneditd = document.querySelector("#table-data").querySelector(".delete");
 function deleteData(index) {
+  let del;
   const data1 = JSON.parse(localStorage.getItem("todosdata"));
-  const d1 = data1.splice(index, 1);
-  window.localStorage.setItem("todosdata", JSON.stringify(data1));
-  //console.log(data1);
-  fetch(`https://jsonplaceholder.typicode.com/todos/${d1}`, {
+  data1.forEach((ele, i) => {
+    if (i === index) {
+      del = ele.id;
+    }
+  });
+  console.log(parseInt(del));
+  fetch(`http://localhost:58120/users/${del}`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .then(data1);
+  }).then((response) => {
+    if (response.ok) {
+      console.log("Resource successfully deleted");
+    } else {
+      console.log("Unable to delete resource");
+    }
+  });
+  data1.splice(index, 1);
+  localStorage.setItem("todosdata", JSON.stringify(data1));
   displaydata(data1);
 }
 function updaterow(index) {
-  const datau = JSON.parse(localStorage.getItem("todosdata"));
-  let updatedata = datau[index].title;
-  // console.log(updatedata);
-  updatedata = prompt("enter new value");
-  console.log(updatedata);
-  //change in api
-  fetch(`https://jsonplaceholder.typicode.com/todos/${index}`, {
-    method: "PATCH",
-    body: JSON.stringify({
-      title: updatedata,
-    }),
-    headers: {
-      "Content-type": "application/json; charset=UTF-8",
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => console.log(data));
-  newdata = JSON.parse(localStorage.getItem("todosdata"));
-  newdata[index].title = updatedata;
-  localStorage.setItem("todosdata", JSON.stringify(newdata));
-  //console.log(newdata);
-  displaydata(newdata);
+  var x = document.querySelector("#table-data").querySelector(`.up${index}`);
+  var y = document.querySelector("#table-data").querySelector(`.btn${index}`);
+  console.log(x, y);
+  y.style.display = "none";
+  x.style.display = "inline";
+  var p = x.querySelector("#id");
+  var s = x.querySelector(".save");
+  s.addEventListener("click", () => {
+    const updatedata = p.value;
+    console.log(updatedata);
+    const data2 = JSON.parse(localStorage.getItem("todosdata"));
+    let del1;
+    data2.forEach((ele, i) => {
+      console.log(ele.id, i);
+      if (i === index) {
+        del1 = ele.id;
+      }
+    });
+    console.log(parseInt(del1));
+    let updateName = updatedata;
+    if (updateName === "") return;
+    fetch(`http://localhost:58120/users/${del1}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: updateName,
+      }),
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+    })
+      .then((response) => response.json())
+      .then((json) => console.log(json))
+      .catch((e) => console.error(e));
+    newdata = JSON.parse(localStorage.getItem("todosdata"));
+    newdata[index].title = updateName;
+    localStorage.setItem("todosdata", JSON.stringify(newdata));
+    displaydata(newdata);
+  });
 }
-
-searchButton.addEventListener("click", function (e) {
+const searchButton = document.querySelector("#search-bar");
+searchButton.addEventListener("input", function (e) {
   e.preventDefault();
-  let searchInputdata = document
-    .querySelector("#search-input")
-    .value.toLowerCase();
+  let searchInputdata = searchButton.value.toLowerCase();
   console.log(searchInputdata);
-  if (searchInputdata === "") {
-    alert("No data found or please enter valid data");
-  }
   newdata = JSON.parse(localStorage.getItem("todosdata"));
   let f = newdata.filter((el) =>
     el.title.toLowerCase().includes(searchInputdata)
   );
   displaydata(f);
-  document.getElementById("search-input").value = "";
 });
-
 sortAsc.addEventListener("click", function (e) {
   e.preventDefault();
   newdata = JSON.parse(localStorage.getItem("todosdata"));
@@ -154,7 +169,6 @@ sortAsc.addEventListener("click", function (e) {
     }
     return 0;
   });
-  //console.log(newdata);
   localStorage.setItem("todosdata", JSON.stringify(newdata));
   displaydata(newdata);
 });
@@ -170,7 +184,6 @@ sortDes.addEventListener("click", function (e) {
     }
     return 0;
   });
-  //console.log(newdata);
   localStorage.setItem("todosdata", JSON.stringify(newdata));
   displaydata(newdata);
 });
